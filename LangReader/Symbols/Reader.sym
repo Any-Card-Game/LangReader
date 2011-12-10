@@ -1,0 +1,11 @@
+﻿Skip :=  (" " | Newline) ;
+
+Ruleset := (Rule)* ;
+
+Rule := ruleName::identifier ":=" RuleExpression ";" ;
+
+RuleExpression := rulePieces::( NamePrefix?  rule::( OrPiece | String | (decreaseTab::("tab" "<")) | (increaseTab::("tab" ">" ))  | rulePiece::identifier ) suffix::("?"|"*") )* ;
+
+OrPiece :="(" RuleExpression1 ("|" RuleExpression)*  ")" ;
+
+NamePrefix := name::identifier "::"   ;

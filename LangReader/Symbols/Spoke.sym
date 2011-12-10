@@ -1,0 +1,38 @@
+﻿Skip :=  (" " | Newline) ;
+
+Class := "class" className::identifier Classbody ;
+ClassBody := tab> (ClassProperty | ClassMethod)*  tab< ;
+ClassProperty := "static"? propertyName::identifier "=" Expression ;
+ClassMethod :=  "def" methodName::identifier? "("  paramName1::identifier? ("," paramName::identifier)* ")"  ScopeBody ;
+ScopeBody := tab> (Statement)*  tab< ;
+Statement := (IfStatement | AnonymousMethod | ReturnStatement | SetStatement) ;
+
+SetStatement := Variable "=" Expression ;
+
+ReturnStatement := "return" Expression ;
+IfStatement := "if" ifExpression::Expression ifBody::(ifScope::ScopeBody)? eleseIfBody::("else" elseIfStatement::IfStatement)? elseBody::("else" elseStatement::ScopeBody)? ;
+
+Expression := (CreateCall | paramedExpression::("(" Expression ")") | Native | AnonymousMethod | BooleanExpressions | negateOrNot::(("-"|"!") Expression) | MethodCall | Variable | CreateNoName | Array | ArrayCall | TypeCall) ;
+
+ArrayCall := Expression Array ;
+Array := "[" arrayValue1::Expression? ("," arrayValue::Expression)* "]" ;
+
+CreateNoName :="{" ( firstCreateParam::(createParamName1::identifier "=" createParamValue1::Expression)? createParams::("," createParamName::identifier "=" createParamValue::Expression)*  )? "}" ;
+
+TypeCall := "type" className::identifier ;
+
+CreateCall := "create" className::identifier createParams::("("  paramName1::Expression? ("," paramName::Expression)*  ")")?   createExpression::("{" firstCreateExpression::(createParamName1::identifier "=" createParamValue1::Expression)? createExpressions::("," createParamName::identifier "=" createParamValue::Expression)*  "}")?  ;
+
+MethodCall := Variable "(" methodParam1::Expression? ("," methodParam::Expression)* ")" ;
+Variable := ( (prefix::Expression "." Variable) | variable::identifier ) ;
+
+BooleanExpression := RelativeExpression ( ("&&" | "||") RelativeExpression )* ;
+
+RelativeExpression := AddExpression (("<" | ">" | "<=" | ">=" | "==") AddExpression )*  ;
+AddExpression    := MultiplyExpression ( ("+" | "-") MultiplyExpression )*  ;
+MultiplyExpression := Expression    (("*" | "/") Expression )*  ;
+
+AnonymousMethod := Expression "=>" anonParamItems( "(" anonParam1::identifier? ("," anonParams::identifier)* ")" )? ScopeBody ;
+Native := (Float | Integer | String | Boolean ) ;
+ 
+Boolean := ("false" | "true" );
